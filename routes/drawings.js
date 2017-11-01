@@ -17,7 +17,7 @@ module.exports = function(server) {
 	server.post(endpoint, (req, res, next) => {
 		if (!req.is('application/json')) {
 			return next(
-				new errors.InvalidContentError('Expects \'application/json\'')
+				getInvalidContentErrorWithMessage('Expects \'application/json\'')
 			);
 		}
 
@@ -26,9 +26,7 @@ module.exports = function(server) {
 		let drawing = new Drawing(data);
 		drawing.save(function(err) {
 			if (err) {
-				console.error(err);
-				return next(new errors.InternalError(err.message));
-				next();
+				return respondError(err, next);
 			}
 
 			res.send(201);
@@ -42,10 +40,7 @@ module.exports = function(server) {
 	server.get(endpoint, (req, res, next) => {
 		Drawing.apiQuery(req.params, function(err, docs) {
 			if (err) {
-				console.error(err);
-				return next(
-					new errors.InvalidContentError(err.errors.name.message)
-				);
+				return respondError(err, next);
 			}
 
 			res.send(docs);
@@ -54,20 +49,23 @@ module.exports = function(server) {
 	});
 
 	/**
-	 * GET
+	 * GET BY ID
 	 */
 	server.get(endpoint+'/:drawing_id', (req, res, next) => {
-		Drawing.findOne({ _id: req.params.drawing_id }, function(err, doc) {
-			if (err) {
-				console.error(err);
-				return next(
-					new errors.InvalidContentError(err.errors.name.message)
-				);
-			}
 
-			res.send(doc);
-			next();
-		});
+		let id = req.params.drawing_id;
+		if (id.match(/^[0-9a-fA-F]{24}$/)) {
+			Drawing.findOne({_id: id}, function (err, doc) {
+				if (err) {
+					return respondError(err, next);
+				}
+
+				res.send(doc);
+				next();
+			});
+		} else {
+			return next(getResourceNotFoundErrorWithMessage('The resource you requested could not be found.'));
+		}
 	});
 
 	/**
@@ -76,7 +74,7 @@ module.exports = function(server) {
 	server.put(endpoint+'/:drawing_id', (req, res, next) => {
 		if (!req.is('application/json')) {
 			return next(
-				new errors.InvalidContentError("Expects 'application/json'")
+				getInvalidContentErrorWithMessage('Expects \'application/json\'')
 			);
 		}
 
@@ -88,24 +86,16 @@ module.exports = function(server) {
 
 		Drawing.findOne({ _id: req.params.drawing_id }, function(err, doc) {
 			if (err) {
-				console.error(err);
-				return next(
-					new errors.InvalidContentError(err.errors.name.message)
-				);
+				return respondError(err, next);
 			} else if (!doc) {
 				return next(
-					new errors.ResourceNotFoundError(
-						'The resource you requested could not be found.'
-					)
+					getResourceNotFoundErrorWithMessage('The resource you requested could not be found.')
 				);
 			}
 
 			Drawing.update({ _id: data._id }, data, function(err) {
 				if (err) {
-					console.error(err);
-					return next(
-						new errors.InvalidContentError(err.errors.name.message)
-					);
+					return respondError(err, next);
 				}
 
 				res.send(200, data);
@@ -120,14 +110,28 @@ module.exports = function(server) {
 	server.del(endpoint+'/:drawing_id', (req, res, next) => {
 		Drawing.remove({ _id: req.params.drawing_id }, function(err) {
 			if (err) {
-				console.error(err);
-				return next(
-					new errors.InvalidContentError(err.errors.name.message)
-				);
+				return respondError(err, next);
 			}
 
 			res.send(204);
 			next();
 		});
 	});
+
+	let getResourceNotFoundErrorWithMessage = function (message) {
+		console.error('Resource not found');
+		return new errors.ResourceNotFoundError(message);
+	};
+
+	let getInvalidContentErrorWithMessage = function (message) {
+		console.error('Invalid Content');
+		return new errors.InvalidContentError(message);
+	};
+
+	let respondError = function (err, next) {
+		console.error(err);
+		return next(
+			getInvalidContentErrorWithMessage(err.errors.name.message)
+		);
+	};
 };
