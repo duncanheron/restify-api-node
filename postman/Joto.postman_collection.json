@@ -1,0 +1,42 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Joto",
+		"_postman_id": "71cebbe5-67bd-09f4-1fa1-60b0c746515b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Drawings POST",
+			"request": {
+				"url": "{{url}}/drawings",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"my first image\",\n\t\"artist\": \"Duncan\"\n}"
+				},
+				"description": "Post single drawing"
+			},
+			"response": []
+		},
+		{
+			"name": "Drawings GET",
+			"request": {
+				"url": "{{url}}/drawings",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Lists drawings"
+			},
+			"response": []
+		}
+	]
+}
