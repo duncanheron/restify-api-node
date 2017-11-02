@@ -10,45 +10,48 @@ let s = require('../startServer');
 const Drawing = require('../models/drawing');
 
 chai.use(chaiHttp);
+const server = restify.createServer({
+	name: config.name,
+	version: config.version,
+});
 
 describe('Drawings', () => {
 
-	const server = restify.createServer({
-		name: config.name,
-		version: config.version,
-	});
-
-	before(() => {
+	before((done) => {
 		s.startServer(server);
+
 		let data = {
 			"name": "sausage",
-			"artist": "Duncan"
+			"artist": "army"
 		};
 		let drawing = new Drawing(data);
 		drawing.save()
 			.then((doc) => {
-				console.log(doc);
+				console.log('saved');
+				done();
 			})
 			.catch((err) => {
 				console.log(err);
+				done();
 			});
 	});
-	after(() => {
-		s.close(server);
-	});
 
-	describe('200 response check', function() {
+	describe('200 response check', function(done) {
 
-		it('should get a 200 response 2', function(done) {
+		it('should get a 200 response', function(done) {
 			api
 				.get('/drawings')
 				.expect(200)
 				.end((err, res) => {
-					console.log(res.body);
+					// console.log(res.body);
+					console.log(res.body.length);
 					done();
 				});
 		});
+	});
 
+	after(() => {
+		s.close(server);
 	});
 
 });
