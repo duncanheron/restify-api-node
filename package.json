@@ -2,16 +2,27 @@
   "name": "joto-api",
   "version": "0.0.1",
   "dependencies": {
+    "assert": "^1.4.1",
+    "axios": "^0.17.0",
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
     "dotenv": "^4.0.0",
     "eslint": "^4.10.0",
+    "mocha": "^4.0.1",
     "mongoose": "^4.12.5",
     "mongoose-string-query": "^0.2.5",
     "mongoose-timestamp": "^0.6.0",
     "restify": "^6.2.3",
+    "restify-clients": "^1.5.2",
     "restify-errors": "^5.0.0",
-    "restify-plugins": "^1.6.0"
+    "restify-plugins": "^1.6.0",
+    "supertest": "^3.0.0"
   },
   "devDependencies": {
-    "eslint-config-google": "^0.9.1"
+    "eslint-config-google": "^0.9.1",
+    "jest": "^21.2.1"
+  },
+  "scripts": {
+    "test": "mocha --timeout 10000"
   }
 }
