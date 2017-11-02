@@ -1,0 +1,8 @@
+{
+    "database": {
+        "name": "test"
+    },
+    "app": {
+        "port": "3030"
+    }
+}

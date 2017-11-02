@@ -1,11 +1,13 @@
 require('dotenv').config();
+
 /**
  * Module Dependencies
  */
+
 const config = require('./config');
 const restify = require('restify');
-const mongoose = require('mongoose');
 const restifyPlugins = require('restify-plugins');
+const s = require('./startServer');
 
 /**
  * Initialize Server
@@ -26,20 +28,4 @@ server.use(restifyPlugins.fullResponse());
 /**
  * Start Server, Connect to DB & Require Routes
  */
-server.listen(config.port, () => {
-	// establish connection to mongodb
-	mongoose.Promise = global.Promise;
-	mongoose.connect(config.db.uri, { useMongoClient: true });
-
-	const db = mongoose.connection;
-
-	db.on('error', err => {
-		console.error(err);
-		process.exit(1);
-	});
-
-	db.once('open', () => {
-		require('./routes/drawings')(server);
-		console.log(`Server is listening on port ${config.port}`);
-	});
-});
+s.startServer(server);

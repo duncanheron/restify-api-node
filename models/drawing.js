@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const mongooseStringQuery = require('mongoose-string-query');
 const timestamps = require('mongoose-timestamp');
-
+mongoose.Promise = Promise;
 const DrawingSchema = new mongoose.Schema(
 	{
 		name: {
